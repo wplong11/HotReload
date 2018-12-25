@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace Xamarin.Forms.HotReload.Observer
 {
-    public static class FileObserver
+    public static class XamlFileObserver
     {
         private static readonly object _locker = new object();
         private static HttpClient _client;
