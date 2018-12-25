@@ -13,9 +13,10 @@ namespace Xamarin.Forms.HotReload.Observer
         private readonly object _locker = new object();
         private HttpClient _client;
         private DateTime _lastChangeTime;
+        private FileSystemWatcher _observer;
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        public void Run(string path, string url)
+        public void Start(string path, string url)
         {
             try
             {
@@ -39,7 +40,7 @@ namespace Xamarin.Forms.HotReload.Observer
             Console.WriteLine($"\n> PATH: {path}");
             Console.WriteLine($"\n> URL: {url}\n");
 
-            var observer = new FileSystemWatcher
+            _observer = new FileSystemWatcher
             {
                 Path = path,
                 NotifyFilter = NotifyFilters.LastWrite,
@@ -53,19 +54,19 @@ namespace Xamarin.Forms.HotReload.Observer
                 BaseAddress = new Uri(url)
             };
 
-            observer.Changed += OnFileChanged;
-            observer.Created += OnFileChanged;
-            observer.Renamed += OnFileChanged;
-            do
-            {
-                Console.WriteLine("\nPRESS \'ESC\' TO STOP.");
-            } while (Console.ReadKey().Key != ConsoleKey.Escape);
-
-            observer.Changed -= OnFileChanged;
-            observer.Created -= OnFileChanged;
-            observer.Renamed -= OnFileChanged;
+            _observer.Changed += OnFileChanged;
+            _observer.Created += OnFileChanged;
+            _observer.Renamed += OnFileChanged;
         }
-        
+
+        public void Stop()
+        {
+            _observer.Changed -= OnFileChanged;
+            _observer.Created -= OnFileChanged;
+            _observer.Renamed -= OnFileChanged;
+            _observer = null;
+        }
+
         private void OnFileChanged(object source, FileSystemEventArgs e)
         {
             var now = DateTime.Now;

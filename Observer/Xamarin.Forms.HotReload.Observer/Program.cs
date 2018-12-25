@@ -17,10 +17,18 @@ namespace Xamarin.Forms.HotReload.Observer
                     .FirstOrDefault(x => x != "127.0.0.1")
                 ?? "127.0.0.1";
 
-            new XamlFileObserver().Run(
+            var xamlFileObserver = new XamlFileObserver();
+            xamlFileObserver.Start(
                 path: RetrieveCommandLineArgument("p=", Environment.CurrentDirectory, args),
                 url: RetrieveCommandLineArgument("u=", $"http://{reloaderServerIP}:8000", args)
             );
+
+            do
+            {
+                Console.WriteLine("\nPRESS \'ESC\' TO STOP.");
+            } while (Console.ReadKey().Key != ConsoleKey.Escape);
+
+            xamlFileObserver.Stop();
         }
 
         private static string RetrieveCommandLineArgument(
