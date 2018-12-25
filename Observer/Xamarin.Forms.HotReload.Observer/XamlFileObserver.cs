@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,21 +15,8 @@ namespace Xamarin.Forms.HotReload.Observer
         private DateTime _lastChangeTime;
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        public void Run()
+        public void Run(string path, string url)
         {
-            var addresses = NetworkInterface.GetAllNetworkInterfaces()
-                          .SelectMany(x => x.GetIPProperties().UnicastAddresses)
-                          .Where(x => x.Address.AddressFamily == AddressFamily.InterNetwork)
-                          .Select(x => x.Address.MapToIPv4())
-                          .Where(x => x.ToString() != "127.0.0.1")
-                          .ToArray();
-
-            var ip = addresses.FirstOrDefault()?.ToString() ?? "127.0.0.1";
-
-            var args = Environment.GetCommandLineArgs();
-            var path = RetrieveCommandLineArgument("p=", Environment.CurrentDirectory, args);
-            var url = RetrieveCommandLineArgument("u=", $"http://{ip}:8000", args);
-            
             try
             {
                 Directory.GetDirectories(path);
@@ -80,12 +64,6 @@ namespace Xamarin.Forms.HotReload.Observer
             observer.Changed -= OnFileChanged;
             observer.Created -= OnFileChanged;
             observer.Renamed -= OnFileChanged;
-        }
-
-        private string RetrieveCommandLineArgument(string key, string defaultValue, string[] args)
-        {
-            var value = args.FirstOrDefault(x => x.StartsWith(key, StringComparison.InvariantCultureIgnoreCase));
-            return value != null ? value.Substring(2, value.Length - 2) : defaultValue;
         }
         
         private void OnFileChanged(object source, FileSystemEventArgs e)
