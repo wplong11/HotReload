@@ -18,27 +18,28 @@ namespace Xamarin.Forms.HotReload.Observer
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         public void Start(string path, string url)
         {
-            try
+            void VerifyPathArgument()
             {
-                Directory.GetDirectories(path);
-            }
-            catch
-            {
-                Console.WriteLine("MAKE SURE YOU PASSED RIGHT PATH TO PROJECT DIRECTORY AS 'P={PATH}' ARGUMENT.");
-                Console.ReadKey();
-                return;
-            }
-
-            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-            {
-                Console.WriteLine("MAKE SURE YOU PASSED RIGHT DEVICE URL AS 'U={DEVICE_URL}' ARGUMENT.");
-                Console.ReadKey();
-                return;
+                try
+                {
+                    Directory.GetDirectories(path);
+                }
+                catch
+                {
+                    throw new ArgumentException("MAKE SURE YOU PASSED RIGHT PATH TO PROJECT DIRECTORY AS 'P={PATH}' ARGUMENT.");
+                }
             }
 
-            Console.WriteLine($"\n\n> HOTRELOADER STARTED AT {DateTime.Now}");
-            Console.WriteLine($"\n> PATH: {path}");
-            Console.WriteLine($"\n> URL: {url}\n");
+            void VerifyUrlArgument()
+            {
+                if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                {
+                    throw new ArgumentException("MAKE SURE YOU PASSED RIGHT DEVICE URL AS 'U={DEVICE_URL}' ARGUMENT.");
+                }
+            }
+
+            VerifyPathArgument();
+            VerifyUrlArgument();
 
             _observer = new FileSystemWatcher
             {
