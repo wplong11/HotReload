@@ -1,26 +1,24 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using System.Net.Http;
-using static System.Math;
-using System.Security.Permissions;
 using System.Linq;
-using System.Net.Sockets;
+using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Security.Permissions;
+using System.Text;
 using System.Text.RegularExpressions;
+using static System.Math;
 
 namespace Xamarin.Forms.HotReload.Observer
 {
-    public static class XamlFileObserver
+    public class XamlFileObserver
     {
-        private static readonly object _locker = new object();
-        private static HttpClient _client;
-        private static DateTime _lastChangeTime;
-
-        public static void Main() => Run();
+        private readonly object _locker = new object();
+        private HttpClient _client;
+        private DateTime _lastChangeTime;
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        private static void Run()
+        public void Run()
         {
             var addresses = NetworkInterface.GetAllNetworkInterfaces()
                           .SelectMany(x => x.GetIPProperties().UnicastAddresses)
@@ -84,13 +82,13 @@ namespace Xamarin.Forms.HotReload.Observer
             observer.Renamed -= OnFileChanged;
         }
 
-        private static string RetrieveCommandLineArgument(string key, string defaultValue, string[] args)
+        private string RetrieveCommandLineArgument(string key, string defaultValue, string[] args)
         {
             var value = args.FirstOrDefault(x => x.StartsWith(key, StringComparison.InvariantCultureIgnoreCase));
             return value != null ? value.Substring(2, value.Length - 2) : defaultValue;
         }
         
-        private static void OnFileChanged(object source, FileSystemEventArgs e)
+        private void OnFileChanged(object source, FileSystemEventArgs e)
         {
             var now = DateTime.Now;
             lock (_locker)
@@ -107,7 +105,7 @@ namespace Xamarin.Forms.HotReload.Observer
             SendFile(filePath);
         }
 
-        private static void SendFile(string filePath)
+        private void SendFile(string filePath)
         {
             var xaml = File.ReadAllText(filePath);
             var data = Encoding.UTF8.GetBytes(xaml);
