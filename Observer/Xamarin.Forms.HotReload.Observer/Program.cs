@@ -71,7 +71,7 @@ namespace Xamarin.Forms.HotReload.Observer
             xamlFileObserver.XamlFileChanged += XamlFileChanged;
             xamlFileObserver.Start(path);
 
-            Console.WriteLine($"\n\n> HOTRELOADER STARTED AT {DateTime.Now}");
+            Console.WriteLine($"\n\n> HOTRELOADER STARTED AT {DateTime.Now.ToString()}");
             Console.WriteLine($"\n> PATH: {path}");
             Console.WriteLine($"\n> URL: {url}\n");
 
@@ -86,7 +86,7 @@ namespace Xamarin.Forms.HotReload.Observer
 
         private async void XamlFileChanged(object sender, XamlFileChangedEventArgs e)
         {
-            Console.WriteLine($"CHANGED {e.ChangedTime}: {e.FileFullPath}");
+            Console.WriteLine($"CHANGED {e.ChangedTime.ToString()}: {e.FileFullPath}");
 
             HttpContent httpContent
                  = new ByteArrayContent(
